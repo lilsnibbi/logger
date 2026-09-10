@@ -31,10 +31,8 @@
 		"check": "bun run typecheck && bun run test && bun run release:verify && bun run lint",
 		"pretty": "bun biome format --write .",
 		"audit": "bun audit --audit-level=high",
-		"release": "bun run scripts/release.ts",
-		"release:sync": "bun run scripts/syncVersions.ts",
 		"release:verify": "bun run scripts/verifyRelease.ts",
-		"pub": "bun publish --access public"
+		"test:package": "bun test tests/package.test.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.12",

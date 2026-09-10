@@ -21,8 +21,8 @@ Sibling checkouts sit beside this one under `Projects/@lilsnibbi/`.
 
 ## Branch Strategy
 
-Use the repository's configured default branch for releases. Renovate currently targets `dev`.
-An exact `vX.Y.Z` tip commit message requests a release; ordinary commits never release.
+Use the repository's configured default branch for releases. Renovate targets the default branch.
+Use Conventional Commits; merge the generated release PR to release.
 
 ## Key Scripts
 
@@ -191,17 +191,14 @@ Tests use `bun:test` (built-in) and mirror the `src/` layout under `tests/`.
 
 ## Releases
 
-An entire `vX.Y.Z` tip commit message on the default branch triggers `release.yml`.
-The workflow verifies, updates metadata, atomically pushes the version commit and tag,
-publishes to npm, and creates a GitHub Release with generated notes.
-Configure `NPM_TOKEN` and allow Actions to push release metadata. Use `RELEASE_TOKEN`
-only if required by branch/tag rules. Retry failed releases from their original Actions run.
-Publish the logger before releasing discord-kit versions that depend on it.
-See [.github/RELEASE_POLICY.md](.github/RELEASE_POLICY.md) for the exact trigger and setup.
+Release Please manages version and changelog PRs from Conventional Commits on main.
+Merging the release PR creates the tag and GitHub release; the publish job verifies
+and publishes that tag. See `.github/RELEASE_POLICY.md` for credentials and retries.
 Do not run release automation during ordinary verification.
+Keep shared release configuration and CI aligned with sibling repositories.
 
 ## Renovate
 
-Auto-dependency updates are configured in `renovate.json`, targeting the `dev`
+Auto-dependency updates are configured in `renovate.json`, targeting the default
 branch. All update types are scheduled "at any time". PRs are
 assigned/reviewed by `lilsnibbi`.

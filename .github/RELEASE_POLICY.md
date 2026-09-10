@@ -1,38 +1,47 @@
 # Releases
 
-A push whose **tip commit's entire message** is exactly `vX.Y.Z` on the repository's default branch starts `.github/workflows/release.yml`.
+Release Please runs on pushes to main. Use Conventional Commits: fix: produces
+a patch, feat: a minor, and feat!: or a BREAKING CHANGE: footer a major.
+Squash-merge feature PRs with a conventional title.
 
-```bash
-git commit --allow-empty -m "v1.2.3"
-git push
-```
-
-Use a new stable version. Prefixes, suffixes, a commit body, prerelease versions, and build metadata do not match. Ordinary commits, tag pushes, and other branches never release. With squash merges, the final squash commit message must be exactly the version. When pushing several commits, the tip must be the release commit.
-
-## Automated steps
-
-1. Validate the exact message and npm credentials.
-2. Set `package.json` to the requested version.
-3. Install locked dependencies (generate `bun.lock` only when missing), audit, run `bun run check`, and dry-run packaging.
-4. If metadata changed, create `chore(release): vX.Y.Z` above the triggering commit.
-5. Atomically push the version commit to the default branch and its annotated tag. If the manifest already matches, tag the triggering commit directly.
-6. Publish to npm under `latest`, then create a GitHub Release with generated release notes.
-
-Verification failures do not push release metadata. No force-pushes or tag moves are performed. If another push advances the default branch before tagging, the release fails safely; put a new version commit on the current tip.
+Review and merge the generated release PR after CI passes. It updates package.json,
+CHANGELOG.md, and .release-please-manifest.json. The next main push creates the
+vX.Y.Z tag and GitHub release, then a separate job checks out that exact tag,
+installs the frozen lockfile, runs checks and the dependency audit, and publishes
+to npm. No manual version commits or version-sync scripts are needed.
 
 ## Setup
 
-- Configure repository secret `NPM_TOKEN` with publish access and permission to publish non-interactively.
-- The automatic `GITHUB_TOKEN` uses `contents: write`. Actions must be allowed to push the version commit and create tags.
-- If branch/tag rules prohibit that token, configure `RELEASE_TOKEN` with Contents read/write and explicitly allow its actor to bypass the applicable rules. Adding a token alone does not bypass branch protection.
-- Everything runs in one workflow, so a personal token is not needed solely to chain workflows.
+- RELEASE_TOKEN: a fine-grained GitHub PAT scoped to this repository with
+  Contents, Issues, and Pull requests read/write. Its actor must be allowed to
+  create release tags under repository rules. It is required so generated PRs
+  trigger CI; the built-in GITHUB_TOKEN does not trigger those workflows.
+- NPM_TOKEN: an npm token scoped to this package with non-interactive publish
+  permission. It is exposed only to the publishing step. Existing Bun publishing
+  is retained; npm trusted publishing can replace this when configured separately.
+- Require both Verify package CI matrix checks before merging to main.
+  CI runs on PRs, main pushes, and manual dispatch with read-only credentials.
+- Keep action SHA pins updated through Renovate.
+- The initial manifest records the existing package version; the next eligible
+  change increments it. Existing versions are not republished during migration.
+- Publish logger before introducing a discord-kit dependency on a new logger
+  version, and commit the resulting registry-backed bun.lock.
 
-Publish `@lilsnibbi/logger@1.1.0` before the first `discord-kit` release that depends on it. The missing Discord lockfile is then generated automatically from npm; local Bun links are not used in CI.
+These packages ship TypeScript source. Tests also pack, extract, build, and import
+the actual package archive, checking public exports and excluding internal files.
+The archive test needs tar, available on both configured GitHub runner platforms.
 
-## Retry
+## Recovery
 
-Use **Actions → Release → the failed run → Re-run failed jobs**. Reuse the original run to preserve its source SHA.
+If publishing fails after the GitHub release exists, use Actions > Release >
+the original run > Re-run failed jobs. This preserves the successful
+Release Please job outputs and the exact tag. Do not rerun all jobs: Release
+Please will not emit release_created again for a release it already created.
+Bun tolerates an already-published version when retrying the publishing job.
+A GitHub release alone does not prove npm publication succeeded.
 
-An existing tag must belong to the original source; its files are checked again. An already-published npm version is tolerated, and an existing GitHub Release is preserved. Reusing the version in a different commit is rejected.
+## References
 
-Changing a manifest alone does not release. The old Promote/Tag workflows are retired. Release scripts are workflow internals; request releases through commit messages.
+- [Release Please action](https://github.com/googleapis/release-please-action)
+- [Manifest configuration](https://github.com/googleapis/release-please/blob/main/docs/manifest-releaser.md)
+- [Bun publishing](https://bun.sh/docs/pm/cli/publish)

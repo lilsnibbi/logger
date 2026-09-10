@@ -2,11 +2,10 @@
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:best-practices"],
 	"timezone": "Australia/Sydney",
-	"baseBranchPatterns": ["dev"],
+	"baseBranchPatterns": ["$default"],
 	"reviewers": ["lilsnibbi"],
 	"labels": ["dependencies", "renovate"],
 	"dependencyDashboardLabels": ["dependencies", "renovate"],
-	"prBodyTemplate": "{{{header}}}{{{table}}}{{{warnings}}}{{{notes}}}{{{changelogs}}}{{{controls}}}",
 	"prCreation": "immediate",
 	"automerge": false,
 	"vulnerabilityAlerts": {
@@ -15,15 +14,10 @@
 	},
 	"packageRules": [
 		{
-			"description": "Allow all dependency updates immediately after release",
-			"matchPackageNames": ["*"],
-			"minimumReleaseAge": null
-		},
-		{
-			"description": "Group non-major Bun dependency updates",
-			"matchManagers": ["bun"],
-			"matchUpdateTypes": ["minor", "patch"],
-			"groupName": "Bun dependencies",
+			"description": "Group Bun and TypeScript development tooling",
+			"matchDepTypes": ["devDependencies"],
+			"matchPackageNames": ["@biomejs/biome", "@types/bun", "typescript"],
+			"groupName": "Bun development tooling",
 			"addLabels": ["bun"]
 		},
 		{
@@ -33,31 +27,9 @@
 			"addLabels": ["github-actions"]
 		},
 		{
-			"description": "Group Docker image updates",
-			"matchDatasources": ["docker"],
-			"groupName": "Docker images",
-			"addLabels": ["docker"],
-			"pinDigests": false
-		},
-		{
 			"description": "Highlight major updates",
 			"matchUpdateTypes": ["major"],
 			"addLabels": ["major-update"]
-		},
-		{
-			"description": "Postgres/Redis: stable numeric tags only, no beta/arch variants",
-			"matchDatasources": ["docker"],
-			"matchPackageNames": ["postgres", "redis"],
-			"ignoreUnstable": true,
-			"enabled": false
-		},
-		{
-			"description": "Track drizzle prerelease builds together",
-			"matchPackageNames": ["drizzle-orm", "drizzle-kit"],
-			"groupName": "Drizzle",
-			"rangeStrategy": "bump",
-			"followTag": "latest"
 		}
-	],
-	"ignoreUnstable": false
+	]
 }

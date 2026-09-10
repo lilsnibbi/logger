@@ -235,11 +235,9 @@ bun run check                     # typecheck, tests, release metadata, biome
 bun run pretty                    # format
 ```
 
-Releases are automated: push a commit whose entire message is exactly
-`v1.2.3` (your desired version) to the repository's default branch.
-CI updates the version, runs checks, pushes an annotated tag, publishes to npm,
-and creates a GitHub Release with generated notes. Configure `NPM_TOKEN`
-and allow Actions to push release metadata. See
+Releases use Conventional Commits and Release Please. Merge the generated release PR
+after CI passes to create the version, changelog, GitHub release, and npm package.
+Configure `RELEASE_TOKEN` and `NPM_TOKEN`; see
 [.github/RELEASE_POLICY.md](.github/RELEASE_POLICY.md).
 
 ## License
