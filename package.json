@@ -1,6 +1,6 @@
 {
 	"name": "@lilsnibbi/logger",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Structured console logger for the Bun runtime, with no styling dependency.",
 	"license": "MIT",
 	"private": false,
