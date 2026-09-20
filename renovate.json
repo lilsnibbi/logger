@@ -1,35 +1,3 @@
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["config:best-practices"],
-	"timezone": "Australia/Sydney",
-	"baseBranchPatterns": ["$default"],
-	"reviewers": ["lilsnibbi"],
-	"labels": ["dependencies", "renovate"],
-	"dependencyDashboardLabels": ["dependencies", "renovate"],
-	"prCreation": "immediate",
-	"automerge": false,
-	"vulnerabilityAlerts": {
-		"assignees": ["lilsnibbi"],
-		"labels": ["dependencies", "renovate", "security"]
-	},
-	"packageRules": [
-		{
-			"description": "Group Bun and TypeScript development tooling",
-			"matchDepTypes": ["devDependencies"],
-			"matchPackageNames": ["@biomejs/biome", "@types/bun", "typescript"],
-			"groupName": "Bun development tooling",
-			"addLabels": ["bun"]
-		},
-		{
-			"description": "Group GitHub Actions updates",
-			"matchManagers": ["github-actions"],
-			"groupName": "GitHub Actions",
-			"addLabels": ["github-actions"]
-		},
-		{
-			"description": "Highlight major updates",
-			"matchUpdateTypes": ["major"],
-			"addLabels": ["major-update"]
-		}
-	]
+	"extends": ["github>lilsnibbi/dots"]
 }
